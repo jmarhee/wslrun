@@ -1,8 +1,8 @@
-docker-build-master:
+wslrun-build-master:
   image: python
-  stage: build
+  stage: install-cli
   script:
     - pip install -e .
-    - wslrun -h
+    - which wslrun
   only:
     - master
