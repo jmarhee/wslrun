@@ -1,4 +1,4 @@
-build-master:
+docker-build-master:
   image: python
   stage: install-cli
   script:
