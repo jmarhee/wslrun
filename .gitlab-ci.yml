@@ -1,8 +1,6 @@
 docker-build-master:
   image: python
-  stage: install-cli
+  stage: build
   script:
     - pip install -e .
     - which wslrun
-  only:
-    - master
