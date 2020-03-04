@@ -7,7 +7,12 @@ author='jmarhee',
 author_email='jmarhee@interiorae.com',
 license='MIT',
 packages=['wslrun'],
-scripts=['bin/wslrun'],
+scripts=['bin/wslrun_test'],
+entry_points = {
+    "console_scripts": [
+        "wslrun = wslrun:main",
+    ]
+},
 install_requires=[
     'pprint',
 ],

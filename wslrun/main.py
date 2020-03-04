@@ -2,6 +2,7 @@ import os
 import json
 import subprocess
 from pprint import pprint
+import sys, getopt, os
 
 def imageCheck(image):
     proc = subprocess.Popen("wsl -d %s --exec uname" % (image), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -67,7 +68,7 @@ def definePipeline(manifestPath):
         pipeline.append(stage_data)
     return pipeline
     
-def main(pipeline_definition):
+def runPipeline(pipeline_definition):
     pipeline = definePipeline(pipeline_definition)
     
     print("Pipeline completed:\n")
@@ -79,5 +80,21 @@ def main(pipeline_definition):
                 print("\n")
     return "Completed."
 
-if __name__ == "__main__":
-    exit(main(pipeline_definition))
+# if __name__ == "__main__":
+#     exit(main(pipeline_definition))
+
+
+def main():
+
+    try:
+        opts, args = getopt.getopt(sys.argv[1:],"hi:o:", ["pipeline=",""])
+    except getopt.GetoptError:
+        print("-p 'pipeline'")
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-p", "--pipeline"):
+            pipeline = arg
+        # elif opt in ("-m", "--mode"):
+        #     mode = arg
+
+    print(runPipeline(pipeline))

@@ -3,4 +3,4 @@ docker-build-master:
   stage: build
   script:
     - pip install -e .
-    - which wslrun
+    - which wslrun_test
