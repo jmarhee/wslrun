@@ -14,6 +14,5 @@ entry_points = {
     ]
 },
 install_requires=[
-    'pprint',
 ],
 zip_safe=False)
