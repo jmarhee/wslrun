@@ -1,6 +1,6 @@
 WSLrun
 ===
-[![Build status](https://ci-central.openfunction.co/api/projects/status/6e2tsa5mh5k4s3el?svg=true)](https://ci-central.openfunction.co/project/AppVeyor/wslrun)
+[![Build status](https://ci-central.openfunction.co/api/projects/status/6e2tsa5mh5k4s3el?svg=true)](https://ci-central.openfunction.co/project/AppVeyor/wslrun) [![PyPI version](https://badge.fury.io/py/wslrun.svg)](https://badge.fury.io/py/wslrun)
 
 A Windows Subsystem for Linux (WSL)-based testing framework written in Python. 
 
