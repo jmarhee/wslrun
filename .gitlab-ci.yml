@@ -1,6 +1,0 @@
-docker-build-master:
-  image: python
-  stage: build
-  script:
-    - pip install -e .
-    - which wslrun_test
