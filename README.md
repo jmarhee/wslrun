@@ -35,20 +35,29 @@ Define a pipeline in your project directory:
 {
     "name": "PS Test",
     "description": "Tests building in multiple environments",
+    "pullPolicy": "Never",
+    "ciMode": "False",
     "stages": [
         {
-            "image": "Alpine",
-            "name": "Install",
+            "image": "AlpineDub",
+            "name": "Build on distro with a passing job",
             "steps": [
                 "sudo apk --update add musl-dev",
-                "sudo apk install -y package"
+                "env CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -v -x -o package-amd64-alpine"
             ]
         },
         {
-            "image": "Ubuntu",
-            "name": "Install-Ubuntu",
+            "image": "UbuntuDub",
+            "name": "Build on distro I know will fail",
             "steps": [
-                "apt install -y package"
+                "GOOS=linux GOARCH=amd64 go build -v -x -o package-amd64-ubuntu"
+            ]
+        },
+        {
+            "image": "AlpineLub",
+            "name": "Build on image I know doesn't exist",
+            "steps": [
+                "env GOOS=linux GOARCH=amd64 go build -v -x -o package-amd64-alpine"
             ]
         }
     ]
@@ -60,16 +69,22 @@ or in YAML:
 ---
 name: PS Test
 description: Tests building in multiple environments
+pullPolicy: Never
+ciMode: 'False'
 stages:
-- image: Alpine
-  name: Install
+- image: AlpineDub
+  name: Build on distro with a passing job
   steps:
   - sudo apk --update add musl-dev
-  - sudo apk install -y package
-- image: Ubuntu
-  name: Install-Ubuntu
+  - env CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -v -x -o package-amd64-alpine
+- image: UbuntuDub
+  name: Build on distro I know will fail
   steps:
-  - apt install -y package
+  - GOOS=linux GOARCH=amd64 go build -v -x -o package-amd64-ubuntu
+- image: AlpineLub
+  name: Build on image I know doesn't exist
+  steps:
+  - GOOS=linux GOARCH=amd64 go build -v -x -o package-amd64-alpine
 ```
 
 For each stage, an `image`, `name`, and list of `steps` will be required.
