@@ -50,13 +50,6 @@ def manifestRead(manifestPath):
     except OSError as e:
         return e
 
-    try:
-        with open(manifestPath, "rt") as manifest_json:
-            manifest = json.load(manifest_json)
-        return manifest
-    except OSError as e:
-        return e
-
 def definePipeline(manifestPath):
     manifest = manifestRead(manifestPath)
     if isinstance(manifest, OSError) == True:
