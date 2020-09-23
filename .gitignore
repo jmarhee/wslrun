@@ -7,6 +7,9 @@ test_lib/
 .vscode/
 .idea/
 
+example/build.yaml
+example/build.json
+
 # Vagrant
 .vagrant/
 

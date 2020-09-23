@@ -1,6 +1,6 @@
 from setuptools import setup
 setup(name='wslrun',
-version='0.1',
+version='0.1.1',
 description='Testing Framework powered by Windows Subsystem for Linux (WSL)',
 url='https://git-central.openfunction.co/jmarhee/wslrun',
 author='jmarhee',
@@ -14,5 +14,6 @@ entry_points = {
     ]
 },
 install_requires=[
+	"pyyaml"
 ],
 zip_safe=False)
