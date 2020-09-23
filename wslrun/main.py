@@ -3,6 +3,7 @@ import json
 import subprocess
 from pprint import pprint
 import sys, getopt, os
+import yaml
 
 def imageCheck(image):
     proc = subprocess.Popen("wsl -d %s --exec uname" % (image), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -42,6 +43,13 @@ def executeSteps(steps,image):
     return stats
 
 def manifestRead(manifestPath):
+    try:
+        with open(manifestPath, "rt") as manifest_json:
+            manifest = yaml.safe_load(manifest_json)
+        return manifest
+    except OSError as e:
+        return e
+
     try:
         with open(manifestPath, "rt") as manifest_json:
             manifest = json.load(manifest_json)

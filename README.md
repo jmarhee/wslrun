@@ -49,6 +49,23 @@ Define a pipeline in your project directory:
     ]
 }
 ```
+or in YAML:
+
+```yaml
+---
+name: PS Test
+description: Tests building in multiple environments
+stages:
+- image: Alpine
+  name: Install
+  steps:
+  - sudo apk --update add musl-dev
+  - sudo apk install -y package
+- image: Ubuntu
+  name: Install-Ubuntu
+  steps:
+  - apt install -y package
+```
 
 For each stage, an `image`, `name`, and list of `steps` will be required.
 
