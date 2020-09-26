@@ -13,6 +13,7 @@ entry_points = {
         "wslrun = wslrun:main",
     ]
 },
+python_requires='>=3',
 install_requires=[
 	"pyyaml"
 ],
