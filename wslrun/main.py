@@ -92,28 +92,17 @@ def runPipeline(pipeline_definition):
 
 
 def main():
-
-    # try:
-    #     opts, args = getopt.getopt(sys.argv[1:],"hi:o:", ["pipeline=",""])
-    # except getopt.GetoptError:
-    #     print("-p 'pipeline'")
-    #     sys.exit(2)
-    # for opt, arg in opts:
-    #     if opt in ("-p", "--pipeline"):
-    #         pipeline = arg
-    #     # elif opt in ("-m", "--mode"):
-    #     #     mode = arg
-
+    
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-p', '--pipeline', help="Path to pipeline file (i.e. build.json, build.yaml")
-    parser.add_argument('-v', '--version', help="wslrun version")
+    parser.add_argument('-v', '--version', help="wslrun version", action='store_true')
 
-    args = parser.parse_args
+    args = parser.parse_args()
 
-    if args.pipeline:
+    if args.pipeline is not None:
         pipeline = args.pipeline
         print(runPipeline(pipeline))
 
-    if args.version:
+    if args.version is not None:
         print(versionInfo())
