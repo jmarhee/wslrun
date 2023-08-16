@@ -39,7 +39,7 @@ Define a pipeline in your project directory:
     "ciMode": "False",
     "stages": [
         {
-            "image": "AlpineDub",
+            "image": "Alpine",
             "name": "Build on distro with a passing job",
             "steps": [
                 "sudo apk --update add musl-dev",
@@ -47,14 +47,14 @@ Define a pipeline in your project directory:
             ]
         },
         {
-            "image": "UbuntuDub",
-            "name": "Build on distro I know will fail",
+            "image": "Ubuntu-22.04",
+            "name": "ubuntu-jammy",
             "steps": [
-                "GOOS=linux GOARCH=amd64 go build -v -x -o package-amd64-ubuntu"
+                "lsb_release -a"
             ]
         },
         {
-            "image": "AlpineLub",
+            "image": "AlpineLatest",
             "name": "Build on image I know doesn't exist",
             "steps": [
                 "env GOOS=linux GOARCH=amd64 go build -v -x -o package-amd64-alpine"
@@ -72,16 +72,16 @@ description: Tests building in multiple environments
 pullPolicy: Never
 ciMode: 'False'
 stages:
-- image: AlpineDub
+- image: Alpine
   name: Build on distro with a passing job
   steps:
   - sudo apk --update add musl-dev
   - env CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -v -x -o package-amd64-alpine
-- image: UbuntuDub
+- image: Ubuntu-22.04
   name: Build on distro I know will fail
   steps:
   - GOOS=linux GOARCH=amd64 go build -v -x -o package-amd64-ubuntu
-- image: AlpineLub
+- image: AlpineLatest
   name: Build on image I know doesn't exist
   steps:
   - GOOS=linux GOARCH=amd64 go build -v -x -o package-amd64-alpine
