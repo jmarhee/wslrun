@@ -2,97 +2,103 @@ import os
 import json
 import subprocess
 from pprint import pprint
-import sys, getopt, os
+import sys
+import getopt
 import yaml
 from pkg_resources import get_distribution, DistributionNotFound
 import argparse
 
-def versionInfo():
-    dist = get_distribution('wslrun')
-    return "wslrun %s" % (dist.version)
+def version_info():
+    dist = get_distribution('py-wslrun')
+    return f"wslrun {dist.version}"
 
-def imageCheck(image):
-    proc = subprocess.Popen("wsl -d %s --exec uname" % (image), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+def image_check(image):
+    proc = subprocess.Popen(f"wsl -d {image} --exec uname", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     while proc.poll() is None:
         continue
-    imageExitCode = proc.wait()
-    return imageExitCode
+    image_exit_code = proc.wait()
+    return image_exit_code
 
-def cmdExit(command,image):
-    cmdStr = 'wsl -d %s --exec %s' % (image, command)
-    print("wslExec (image: %s): %s" % (image, command))
-    proc = subprocess.Popen(cmdStr, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    while proc.poll() is None:
-        # print(str(proc.stdout.readline()))
-        continue
-    commandResult = proc.wait()
-    return { 'exit_code': commandResult }
+# def cmd_exit(command, image):
+#     cmd_str = f"wsl -d {image} --exec {command}"
 
-def executeSteps(steps,image):
+#     print(f"wslExec (image: {image}): {command}")
+#     proc = subprocess.Popen(cmd_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+#     while proc.poll() is None:
+#         continue
+#     command_result = proc.wait()
+#     return {'exit_code': command_result}
+
+def execute_wsl_command(command, image):
+    process = subprocess.run(['wsl', '-d', image, '--', 'bash', '-c', command], capture_output=True, text=True)
+    return process.returncode, process.stdout.strip(), process.stderr.strip()
+
+def execute_steps(steps, image):
     stats = []
     exits = []
     completed = {}
-    for k,v in enumerate(steps):
-        commandRunner = cmdExit(v, image)
+    for k, v in enumerate(steps):
+        # command_runner = cmd_exit(v, image)
         step = {}
         step['id'] = k
-        step['exit_code'] = commandRunner['exit_code']
+        print(f'Executing command: {step}')
+        returncode, output, errout = execute_wsl_command(v, image)
+        step['exit_code'] = returncode
         step['cmd'] = v
         stats.append(step)
-        exits.append(commandRunner['exit_code'])
-        if commandRunner['exit_code'] == 0:
-            print("✔️: %s\n" % (v))
+        exits.append(returncode)
+        if returncode == 0:
+            print(f"✔️: {v}\n")
         else:
-            print("❌: %s\n" % (v))
-    completed['completions'] = "%s/%s" % (exits.count(0), len(exits))
+            print(f"❌: {v}\n")
+        print(f'Return code: {returncode}')
+        print(f'STDOUT: {output}')
+        print(f'STDERR: {errout}')
+        print('-' * 30)
+    completed['completions'] = f"{exits.count(0)}/{len(exits)}"
     stats.append(completed)
     return stats
 
-def manifestRead(manifestPath):
+def manifest_read(manifest_path):
     try:
-        with open(manifestPath, "rt") as manifest_json:
+        with open(manifest_path, "rt") as manifest_json:
             manifest = yaml.safe_load(manifest_json)
         return manifest
     except OSError as e:
         return e
 
-def definePipeline(manifestPath):
-    manifest = manifestRead(manifestPath)
-    if isinstance(manifest, OSError) == True:
+def define_pipeline(manifest_path):
+    manifest = manifest_read(manifest_path)
+    if isinstance(manifest, OSError):
         print(manifest)
         exit(2)
     pipeline = []
     for stage in manifest['stages']:
         stage_data = {}
         stage_data['name'] = stage['name']
-        imageStatus = imageCheck(stage['image'])
-        if imageStatus == 0:
-            job = executeSteps(stage['steps'], stage['image'])
-            print("🔔: %s completed."  % (stage['name']))
+        image_status = image_check(stage['image'])
+        if image_status == 0:
+            job = execute_steps(stage['steps'], stage['image'])
+            print(f"🔔: {stage['name']} completed.")
             stage_data['stages_run'] = job
         else:
-            stage_data['stages_run'] = [{ "completions": "0/0, Image %s Unavailable: %s" % (stage['image'], imageStatus) }]
+            stage_data['stages_run'] = [{"completions": f"0/0, Image {stage['image']} Unavailable: {image_status}"}]
         pipeline.append(stage_data)
     return pipeline
     
-def runPipeline(pipeline_definition):
-    pipeline = definePipeline(pipeline_definition)
+def run_pipeline(pipeline_definition):
+    pipeline = define_pipeline(pipeline_definition)
     
     print("Pipeline completed:\n")
     for job in pipeline:
-        print("🧾 Report: " + job['name'] + "...\n")
+        print(f"🧾 Report: {job['name']}...\n")
         for j in job['stages_run']:
             if 'completions' in j:
                 pprint(j)
                 print("\n")
     return "Completed."
 
-# if __name__ == "__main__":
-#     exit(main(pipeline_definition))
-
-
 def main():
-    
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-p', '--pipeline', help="Path to pipeline file (i.e. build.json, build.yaml")
@@ -102,7 +108,7 @@ def main():
 
     if args.pipeline is not None:
         pipeline = args.pipeline
-        print(runPipeline(pipeline))
+        print(run_pipeline(pipeline))
 
     if args.version is not None:
-        print(versionInfo())
+        print(version_info())
